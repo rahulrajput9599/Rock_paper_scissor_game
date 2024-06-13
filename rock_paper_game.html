@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: radial-gradient(circle, #89CFF0, #3B5998);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .game-container:active {
+            transform: translateY(-10px);
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #FFD700, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .choices {
+            margin-bottom: 30px;
+        }
+
+        .choice {
+            background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .choice:hover {
+            transform: scale(1.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .choice img {
+            display: block;
+            margin: 0 auto;
+            width: 80px;
+            height: 80px;
+        }
+
+        .choice p {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .result p {
+            font-size: 22px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #reset {
+            background: linear-gradient(to right, #00FF7F, #32CD32);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 22px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background 0.3s, transform 0.3s;
+            margin-top: 30px;
+        }
+
+        #reset:hover {
+            background: linear-gradient(to right, #32CD32, #00FF7F);
+            transform: scale(1.1);
+        }
+
+        #user-choice span,
+        #computer-choice span,
+        #game-result span {
+            font-weight: bold;
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        .celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ffd700, #ff4500);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: burst 2s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .win {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+        }
+
+        .lose {
+            background: linear-gradient(to right, #ff4b2b, #ff416c);
+        }
+
+        .tie {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+
+        .choice.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container" id="game-container">
+        <h1>Rock Paper Scissors</h1>
+        <div class="choices">
+            <button class="choice" id="rock" onclick="playGame('rock')">
+                <img src="https://www.campcanary.co.uk/uploads/rock-icon-grey.png" alt="Rock">
+                <p>Rock</p>
+            </button>
+            <button class="choice" id="paper" onclick="playGame('paper')">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.0gPDMc2eLvNq1MknlIdDZgAAAA&pid=Api&P=0&h=220" alt="Paper">
+                <p>Paper</p>
+            </button>
+            <button class="choice" id="scissors" onclick="playGame('scissors')">
+                <img src="https://tse1.mm.bing.net/th?id=OIP.5O7Gawnu-wiGs41Hpt19DQHaHY&pid=Api&P=0&h=220"
+                    alt="Scissors">
+                <p>Scissors</p>
+            </button>
+        </div>
+        <div class="result">
+            <p id="user-choice">Your Choice: <span></span></p>
+            <p id="computer-choice">Computer's Choice: <span></span></p>
+            <p id="game-result">Result: <span></span></p>
+        </div>
+        <button id="reset" onclick="resetGame()">Reset Game</button>
+        <div class="celebration" id="celebration">
+            <!-- Stars elements will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        function playGame(userChoice) {
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+
+            document.querySelector('#user-choice span').innerHTML = getChoiceImage(userChoice) + ' ' + capitalize(userChoice);
+            document.querySelector('#computer-choice span').innerHTML = getChoiceImage(computerChoice) + ' ' + capitalize(computerChoice);
+
+            const result = determineWinner(userChoice, computerChoice);
+            const gameResultEl = document.querySelector('#game-result span');
+            gameResultEl.textContent = result;
+
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.classList.remove('win', 'lose', 'tie');
+
+            if (result === "You win!") {
+                gameContainer.classList.add('win');
+                showStars();
+            } else if (result === "You lose!") {
+                gameContainer.classList.add('lose');
+                document.querySelector('.game-container').classList.add('shake');
+                setTimeout(() => document.querySelector('.game-container').classList.remove('shake'), 500);
+            } else {
+                gameContainer.classList.add('tie');
+            }
+
+            disableChoices();
+        }
+
+        function getChoiceImage(choice) {
+            const images = {
+                rock: '<img src="https://www.campcanary.co.uk/uploads/rock-icon-grey.png" alt="Rock" width="50">',
+                paper: '<img src="https://tse1.mm.bing.net/th?id=OIP.0gPDMc2eLvNq1MknlIdDZgAAAA&pid=Api&P=0&h=220" alt="Paper" width="50">',
+                scissors: '<img src="https://tse1.mm.bing.net/th?id=OIP.5O7Gawnu-wiGs41Hpt19DQHaHY&pid=Api&P=0&h=220" alt="Scissors" width="50">'
+            };
+            return images[choice];
+        }
+
+        function determineWinner(user, computer) {
+            if (user === computer) {
+                return "It's a tie!";
+            } else if (
+                (user === 'rock' && computer === 'scissors') ||
+                (user === 'paper' && computer === 'rock') ||
+                (user === 'scissors' && computer === 'paper')
+            ) {
+                return "You win!";
+            } else {
+                return "You lose!";
+            }
+        }
+
+        function disableChoices() {
+            document.querySelectorAll('.choice').forEach(button => {
+                button.disabled = true;
+                button.classList.add('disabled');
+            });
+        }
+
+        function resetGame() {
+            document.querySelector('#user-choice span').innerHTML = '';
+            document.querySelector('#computer-choice span').innerHTML = '';
+            document.querySelector('#game-result span').textContent = '';
+
+            document.querySelectorAll('.choice').forEach(button => {
+                button.disabled = false;
+                button.classList.remove('disabled');
+            });
+
+            document.getElementById('game-container').classList.remove('win', 'lose', 'tie');
+            document.getElementById('celebration').style.display = 'none';
+            clearStars();
+        }
+
+        function showStars() {
+            const celebrationEl = document.getElementById('celebration');
+            celebrationEl.style.display = 'flex';
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDelay = `${Math.random() * 0.5}s`;
+                celebrationEl.appendChild(star);
+            }
+            setTimeout(() => {
+                celebrationEl.style.display = 'none';
+                clearStars();
+            }, 22000);
+        }
+
+        function clearStars() {
+            const celebrationEl = document.getElementById('celebration');
+            while (celebrationEl.firstChild) {
+                celebrationEl.removeChild(celebrationEl.firstChild);
+            }
+        }
+
+        function capitalize(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+    </script>
+</body>
+
+</html>
